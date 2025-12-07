@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Study Buddy</title>
+
+
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+
+<!-- Bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<style>
+:root { --maroon: #7b1f2b; --maroon-soft: #a14550; }
+body.bg-soft { background-color: #f8f2f2; }
+.maroon { color: var(--maroon); }
+.btn-outline-maroon { color: var(--maroon); border-color: var(--maroon); }
+.btn-outline-maroon:hover { background-color: var(--maroon); color: #fff; }
+.btn-maroon { background-color: var(--maroon); color: #fff; border:none; }
+.btn-maroon:hover { background-color: var(--maroon-soft); }
+
+
+#calendar-section.highlight,
+#task-chart.highlight {
+  border: 2px solid #ff9e80;
+  box-shadow: 0 0 15px #ff9e80;
+  transition: all 0.3s ease-in-out;
+}
+
+
+#task-chart {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: 200px !important; /* sesuai untuk dashboard */
+}
+</style>
+</head>
+<body class="bg-soft">
+
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg" style="background-color: #7b1f2b;">
+  <div class="container">
+    <a class="navbar-brand text-white fw-bold" href="index.html">My Study Buddy</a>
+
+
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+
+
+        <li class="nav-item">
+          <a class="nav-link text-white" href="index.html">Home</a>
+        </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link text-white" href="course.html">Course</a>
+        </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link text-white" href="summary.html">Summary</a>
+        </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link text-white d-flex align-items-center" href="login.html" title="Logout">
+            <i class="bi bi-power"></i>
+          </a>
+        </li>
+
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="container my-4">
+  <div class="row g-4">
+    <!-- Left Column: Student Info + Tasks -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="maroon">Student Info</h5>
+          <p id="student-name" class="mb-1 lead">—</p>
+          <p id="student-email" class="text-muted small mb-0">—</p>
+        </div>
+      </div>
+
+
+      <div class="card shadow-sm mt-3">
+        <div class="card-body">
+          <h6 class="maroon">Tasks List</h6>
+          <form id="task-form" class="row g-2 align-items-end">
+            <div class="col-6">
+              <label class="form-label small">Date</label>
+              <input id="task-date" type="date" class="form-control form-control-sm">
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Type</label>
+              <select id="task-type" class="form-select form-select-sm">
+                <option>Assignment</option>
+                <option>Presentation</option>
+                <option>Exam</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label small">Title</label>
+              <input id="task-title" class="form-control form-control-sm" placeholder="e.g., IMS566 Ind Assignment">
+            </div>
+            <div class="col-12">
+              <button class="btn btn-outline-maroon btn-sm w-100" type="button" id="add-task">Add Task</button>
+            </div>
+          </form>
+
+
+          <div class="mt-3">
+            <h6 class="small mb-2">Upcoming</h6>
+            <ul id="task-upcoming" class="list-group list-group-flush small"></ul>
+            <h6 class="small mt-3 mb-2">Past</h6>
+            <ul id="task-past" class="list-group list-group-flush small"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  <!-- Right Column: Dashboard -->
+<div class="col-lg-8">
+
+
+  <!-- Dashboard Card -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h4 class="maroon">Dashboard</h4>
+      <p class="text-muted small mb-3">Quick overview of your study progress.</p>
+
+
+      <div class="row gy-3">
+
+
+        <!-- LEFT COLUMN: Upcoming Tasks (top) + GPA (bottom) -->
+        <div class="col-md-6">
+
+
+          <!-- Upcoming Tasks -->
+          <div class="p-3 bg-white rounded-2 border mb-3">
+            <small class="text-muted">Upcoming Tasks</small>
+            <h5 id="upcoming-count" class="mt-1">0</h5>
+          </div>
+
+
+          <!-- GPA -->
+          <div class="p-3 bg-white rounded-2 border">
+            <small class="text-muted">Current GPA</small>
+            <h5 id="current-gpa" class="mt-1">—</h5>
+          </div>
+
+
+        </div>
+
+
+        <!-- RIGHT COLUMN: Task Categories -->
+        <div class="col-md-6">
+          <div class="p-3 bg-white rounded-2 border h-100">
+            <small class="text-muted">Task Categories</small>
+            <canvas id="task-chart"></canvas>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Calendar Card -->
+  <div id="calendar-section" class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h4 class="maroon mb-3">Calendar</h4>
+      <div id="calendar"></div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<footer class="text-center py-3 text-muted small">© 2025 • My Study Buddy</footer>
+
+
+<!-- Modal for Task -->
+<div class="modal fade" id="taskModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title maroon">Task Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="task-id">
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          <input id="task-title-modal" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Due Date</label>
+          <input id="task-due" type="date" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Category</label>
+          <select id="task-type-select" class="form-select">
+            <option value="Assignment" data-color="#7b1f2b">Assignment</option>
+            <option value="Exam" data-color="#2b7b64">Exam</option>
+            <option value="Presentation" data-color="#1f4c7b">Presentation</option>
+            <option value="Other" data-color="#7b6d1f">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="delete-task" class="btn btn-danger me-auto d-none">Delete</button>
+        <button class="btn btn-maroon" id="save-task">Save Task</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+if(sessionStorage.getItem('loggedIn')!=='true'){ window.location.href='login.html'; }
+
+
+// Student info
+const email=sessionStorage.getItem('userEmail');
+const users=JSON.parse(localStorage.getItem('users')||'[]');
+const user=users.find(u=>u.email===email);
+if(user){
+  document.getElementById('student-name').textContent=user.firstName+' '+user.lastName;
+  document.getElementById('student-email').textContent=user.email;
+}
+
+
+// Helper
+function qs(id){ return document.getElementById(id); }
+function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
+function readTasks(){ return JSON.parse(localStorage.getItem('tasks')||'[]'); }
+function saveTasks(arr){ localStorage.setItem('tasks',JSON.stringify(arr)); }
+
+
+const taskUpcomingEl=qs('task-upcoming');
+const taskPastEl=qs('task-past');
+const modalEl=qs('taskModal');
+const modalInstance=modalEl?new bootstrap.Modal(modalEl):null;
+
+
+let calendar=null;
+
+
+//Current GPA
+function updateCGPAOnDashboard() {
+  const hist = JSON.parse(localStorage.getItem("gpaHistory") || "[]");
+
+
+  const el = document.getElementById("current-gpa");
+  if (!el) return;
+
+
+  if (!hist || hist.length === 0) {
+    el.textContent = "—";
+    return;
+  }
+
+
+  const latestgpa = hist[hist.length - 1].value;
+  el.textContent = Number(latestgpa).toFixed(2);
+}
+
+
+// Run on page load
+updateCGPAOnDashboard();
+
+
+// Render Task Lists
+function renderTaskLists(){
+  const tasks = readTasks().filter(t => t.due && t.title)
+    .sort((a,b) => new Date(a.due) - new Date(b.due));
+  const today = new Date().toISOString().split('T')[0];
+  taskUpcomingEl.innerHTML = ''; taskPastEl.innerHTML = '';
+  tasks.forEach(t => {
+    const li = document.createElement('li');
+    li.className = 'list-group-item small';
+    let editBtn = '';
+    if(t.due >= today){ editBtn = `<button class="btn btn-sm btn-outline-secondary me-1 edit-task-btn" data-id="${t.id}">Edit</button>`; }
+    li.innerHTML = `
+      <div class="d-flex justify-content-between">
+        <div><strong>${t.title}</strong><div class="small text-muted">${t.type} • ${t.due}</div></div>
+        <div>${editBtn}<button class="btn btn-sm btn-danger delete-task-btn" data-id="${t.id}">Delete</button></div>
+      </div>`;
+    if(t.due >= today){ taskUpcomingEl.appendChild(li); } else { taskPastEl.appendChild(li); }
+  });
+  qsa('.edit-task-btn').forEach(b => b.addEventListener('click', e => openTaskModalForId(e.target.dataset.id)));
+  qsa('.delete-task-btn').forEach(b => b.addEventListener('click', e => deleteTaskById(e.target.dataset.id)));
+  updateUpcomingCount();
+}
+
+
+function updateUpcomingCount(){
+  const tasks=readTasks().filter(t=>t.due && t.title);
+  const today=new Date().toISOString().split('T')[0];
+  qs('upcoming-count').textContent=tasks.filter(t=>t.due>=today).length;
+}
+
+
+function deleteTaskById(id){
+  let tasks=readTasks();
+  tasks=tasks.filter(t=>t.id!==id); saveTasks(tasks); refreshAll();
+}
+
+
+function openTaskModalForId(id){
+  const t=readTasks().find(x=>x.id===id); if(!t)return;
+  qs('task-id').value=t.id; qs('task-title-modal').value=t.title;
+  qs('task-due').value=t.due; qs('task-type-select').value=t.type;
+  qs('delete-task').classList.remove('d-none'); modalInstance.show();
+}
+
+
+function openTaskModalForNew(){
+  qs('task-id').value=''; qs('task-title-modal').value=''; qs('task-due').value='';
+  qs('task-type-select').value='Assignment'; qs('delete-task').classList.add('d-none'); modalInstance.show();
+}
+
+
+// ===== Add Task Form =====
+qs('add-task').addEventListener('click',()=>{
+  const date=qs('task-date').value; const type=qs('task-type').value;
+  const title=qs('task-title').value.trim(); if(!date||!title){ alert('Please enter date and title'); return; }
+  const id='t'+Date.now();
+  const colorMap={Assignment:'#7b1f2b',Exam:'#2b7b64',Presentation:'#1f4c7b',Other:'#7b6d1f'};
+  const color=colorMap[type]||'#7b1f2b';
+  const tasks=readTasks(); tasks.push({id,title,due:date,type,color}); saveTasks(tasks);
+  refreshAll(); qs('task-title').value=''; qs('task-date').value='';
+});
+
+
+// ===== Save Task Modal =====
+qs('save-task').addEventListener('click',()=>{
+  const id=qs('task-id').value||('t'+Date.now());
+  const title=qs('task-title-modal').value.trim();
+  const due=qs('task-due').value;
+  const type=qs('task-type-select').value;
+  const color=qs('task-type-select').selectedOptions[0].dataset.color||'#7b1f2b';
+  if(!title||!due){ alert('Please enter title and due date'); return; }
+
+
+  let tasks=readTasks();
+  const idx=tasks.findIndex(t=>t.id===id);
+  const taskObj={id,title,due,type,color};
+ 
+  if(idx>=0) tasks[idx]=taskObj;
+  else tasks.push(taskObj);
+
+
+  saveTasks(tasks);
+  refreshAll();
+  modalInstance.hide();
+});
+
+
+qs('delete-task').addEventListener('click',()=>{
+  const id=qs('task-id').value; if(!id)return; if(!confirm('Delete this task?')) return;
+  deleteTaskById(id); modalInstance.hide();
+});
+
+
+// ===== Chart.js =====
+let taskChart=null;
+function updateTaskChart(){
+  const ctx=qs('task-chart').getContext('2d');
+  const tasks=readTasks().filter(t=>t.due && t.title);
+  const typeCounts={Assignment:0, Exam:0, Presentation:0, Other:0};
+  tasks.forEach(t=>{ if(t.type in typeCounts) typeCounts[t.type]++; });
+  const labels=Object.keys(typeCounts).filter(k=>typeCounts[k]>0);
+  const dataValues=labels.map(k=>typeCounts[k]);
+  const colors=labels.map(k=>({Assignment:'#7b1f2b', Exam:'#2b7b64', Presentation:'#1f4c7b', Other:'#7b6d1f'}[k]));
+  const data={labels, datasets:[{data:dataValues, backgroundColor:colors}]};
+
+
+  if(taskChart){ taskChart.data=data; taskChart.update(); }
+  else {
+    taskChart=new Chart(ctx,{
+      type:'pie',
+      data:data,
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{position:'bottom'},
+          tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} task(s)`}}
+        }
+      }
+    });
+  }
+}
+
+
+// ===== Refresh All =====
+function refreshAll(){
+  renderTaskLists();
+  if(calendar){
+    calendar.getEvents().forEach(e=>e.remove());
+    readTasks().filter(t=>t.due && t.title).forEach(t=>{
+      calendar.addEvent({id:t.id, title:t.type+': '+t.title, start:t.due, allDay:true, backgroundColor:t.color, borderColor:t.color});
+    });
+  }
+  updateTaskChart();
+}
+
+
+// ===== FullCalendar =====
+document.addEventListener('DOMContentLoaded',()=>{
+  const calendarEl=qs('calendar');
+  if(calendarEl){
+    calendar=new FullCalendar.Calendar(calendarEl,{
+      initialView:'dayGridMonth',
+      selectable:true, editable:true,
+      headerToolbar:{left:'prev,next today',center:'title',right:'dayGridMonth,timeGridWeek,timeGridDay'},
+      select: info => { openTaskModalForNew(); qs('task-due').value = info.startStr; },
+      eventClick: info => { openTaskModalForId(info.event.id); },
+      eventDrop: info => {
+        const id=info.event.id; const newDate=info.event.startStr.split('T')[0];
+        let tasks=readTasks(); const idx=tasks.findIndex(t=>t.id===id);
+        if(idx>=0){ tasks[idx].due=newDate; saveTasks(tasks); refreshAll(); }
+      }
+    });
+    calendar.render();
+    refreshAll();
+  }
+});
+
+
+})();
+</script>
+
+</body>
+</html>
+
+
