@@ -42,7 +42,7 @@ Instruction to Test Login
 -if correct, redirect to Home Page
 -if incorrect, "invalid email or password"
 
-Framewworks or Libraries Used:
+Frameworks or Libraries Used:
 -Fronted Framework : Bootstrap 5.3.3
 -Bootstrap Icons
 -Css styling
