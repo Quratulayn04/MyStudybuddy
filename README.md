@@ -1,9 +1,9 @@
 MyStudybuddy : Personal Study Dashboard.
 
-A. Project Description
+A. PROJECT DESCRIPTION
 A web-based study management dashboard designed to help students organise academic information in one place. The system enables students to track their coursework, manage semester subjects, monitor GPA progress, and plan their study routine using an integrated calendar. This is for supports student's academic productivity, time management, and progress monitoring.
 
-B. Features Included
+B. FEATURES INCLUDED
 
 User Authentication 
 -Student registration (email + password) 
@@ -18,22 +18,23 @@ Home Dashboard
 
 Course and Subjects Management 
 -Student must add course first then select semester. 
--Add, Delete, Edit Subjects under the selected semester. 
+-Add, Delete, Edit the Subjects under the selected semester. 
 -Students can see list of their subjects in each semesters. 
 -Students are required to enter Subject code,name and credit hour. 
 -All data is stored locally and retained even after the browser is closed.
 
 Summary of study : GPA and CGPA Tracking 
--System calculates GPA for each semester information student stored using credit hours and Grades (A+ - F) 
+-System calculates GPA for each semester information student stored using credit hours and Grades (A+ to F) 
 -Stores GPA for previous semesters 
 -Automatically calculates cumulative CGPA
+
 Beautiful Modern UI 
 -Maroon + cream soft theme 
 -Clean Bootstrap layout 
 -Rounded buttons, soft shadows, minimalist cards
 -Responsive across laptop, tablet, and mobile
 
-C. Instruction to Test Login
+C. INSTRUCTION TO TEST LOGIN
 Register first before sign up: 
 -Name, Email, Password 
 -The account is saved in localStorage
@@ -42,7 +43,7 @@ Login:
 -if correct, redirect to Home Page 
 -if incorrect, "invalid email or password"
 
-D. Frameworks or Libraries Used: 
+D. FRAMEWORK USED: 
 -Fronted Framework : Bootstrap 5.3.3 
 -Bootstrap Icons 
 -Css styling 
